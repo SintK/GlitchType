@@ -1,0 +1,109 @@
+<html>
+	<head>
+		<title>Stay Connected</title>
+		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+	</head>
+	
+	<body onload="init();">
+		<canvas id="canvas" width="1311" height="1819" ></canvas>
+
+		<script type="text/javascript" >
+
+			//Global variables (you can use them in all functions)
+			var
+				context = document.getElementById('canvas').getContext('2d'),
+				pixels;
+
+			//This is the init function.
+			init = function() {
+
+				//Load image.
+				loadImage('data/4.png');
+
+				//setInterval( init, 100 );
+
+			}
+
+		 	//Load image.
+			function loadImage(url){
+
+				//Create a new "Image Object".
+	      var imageObj = new Image();
+	      imageObj.onload = function() {
+
+	      	//Image is loaded. Draw image now.
+	        drawImage(this);
+
+		      //Distortion... starts.... now!
+					distort();
+
+	      };
+	      imageObj.src = url;
+
+			}
+
+			//This is the drawImage function
+			//It draws an image to the screen.
+      function drawImage(imageObj){
+
+        var imageX = 0;
+        var imageY = 0;
+        var imageWidth = imageObj.width;
+        var imageHeight = imageObj.height;
+
+        context.drawImage(imageObj, imageX, imageY);
+
+        var imageData = context.getImageData(imageX, imageY, imageWidth, imageHeight);
+        
+        pixels = imageData.data;
+
+      }
+
+			//This is the distort function.
+			distort = function(){
+
+				var distance;
+
+				for( y = 0; y <= context.canvas.height; y++ ){  //ga elke rij van de canvas langs
+
+					var beamHeight = Math.random() * 20 + 5;
+					beamHeight = parseInt(beamHeight);
+
+					if(y % beamHeight == 0){ // hier pas je de hoogte van de balken
+						distance = Math.random() * 20;
+						distance = parseInt(distance); //Maak er een geheel getal van, ipv een floating point getal
+					}
+
+					for( x = 0; x <= context.canvas.width; x++ ){
+
+						var start_position = y * context.canvas.width * 4 + x * 4;
+	
+						var red = pixels[ start_position + 0 ];
+						var green = pixels[ start_position + 1 ];
+						var blue = pixels[ start_position + 2 ];
+						var alpha = pixels[ start_position + 3 ];
+
+						// Verwijder de oude pixels. op de oude positie.
+						// Alleen als de kleur niet al zwart was.	
+						if(red+green+blue > 0){
+						 	context.fillStyle = 'rgb( 0, 0, 0 )'; 
+						 	context.fillRect( x, y, 1, 1 );
+					  }
+
+						// Plaats de pixels op de nieuwe positie.
+						context.fillStyle = 'rgb( ' + red + ', ' + green + ', ' + blue + ' )'; // kleur die het wordt. 
+					 	context.fillRect( x - distance, y, 1, 1 );
+
+					}
+				}
+
+			}
+
+			function log(txt){
+				console.log(txt);
+			}
+
+	   </script>
+	</body>
+</html>
+
